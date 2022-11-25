@@ -1,4 +1,4 @@
-﻿using Microsoft.Build.Tasks;
+﻿using Microsoft.Build;
 using Microsoft.Reporting.WebForms;
 using Newtonsoft.Json;
 using OpenQA.Selenium;
@@ -1242,7 +1242,7 @@ namespace ServicesCekTradefeed
                 IWebElement password = ChromeDriver.FindElement(By.Id("ELEMENT_login_password"));
                 IWebElement submit_login = ChromeDriver.FindElement(By.Id("ELEMENT_login_button"));
                 username.SendKeys("admin");
-                password.SendKeys("Sophos123!@");
+                password.SendKeys("Sy5t3mS0ph05i3i3!@#");
                 submit_login.Click();
                 Thread.Sleep(10000);
                 ((IJavaScriptExecutor)ChromeDriver).ExecuteScript("window.open('https://10.10.10.2:4444/qm/?lang=english');");
@@ -1508,7 +1508,7 @@ namespace ServicesCekTradefeed
         protected override void OnStop()
         {
             WriteToFile("Service is started at " + DateTime.Now);
-            bot.StopReceiving();
+            bot.StartReceiving();
         }
         public static void WriteToFile(string Message)
         {
