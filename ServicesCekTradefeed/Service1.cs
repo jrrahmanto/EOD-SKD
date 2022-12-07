@@ -256,6 +256,34 @@ namespace ServicesCekTradefeed
         {
             var dr_validasi = new DataSet1TableAdapters.Validation_SettlementPrice_ExceptionsTableAdapter();
             var dt_validasi = dr_validasi.GetData(businessDate);
+
+            var count_sp_urgent = 0;
+            List<string> dataSPurgent = new List<string>();
+
+            var dr_contract = new DataSet1TableAdapters.ContractTableAdapter();
+            var dt_contract = dr_contract.GetDataByEndSpot(Convert.ToDateTime(businessDate));
+
+            var dr_com = new DataSet1TableAdapters.CommodityTableAdapter();
+            var dr_parameterSP = new DataSet1TableAdapters.ParameterSettlementPriceUrgentTableAdapter();
+            var dr_SPUrgent = new DataSet1TableAdapters.SettlementPriceTableAdapter();
+
+            if (dt_contract.Count != 0)
+            {
+                foreach (var item in dt_contract)
+                {
+                    var dt_com = dr_com.GetDataByComId(item.CommodityID).FirstOrDefault();
+                    var dt_parameterSP = dr_com.GetDataByComCode(dt_com.CommodityCode).FirstOrDefault();
+                    if (dt_parameterSP != null)
+                    {
+                        var dt_urgent = dr_SPUrgent.GetDataByUrgent(item.ContractID,businessDate).FirstOrDefault();
+                        if (dt_urgent == null)
+                        {
+                            count_sp_urgent++;
+                            dataSPurgent.Add(dt_com.CommodityCode);
+                        }
+                    }
+                }
+            }
             WriteToFile("Validasi EOD " + DateTime.Now.ToString("hh:mm:ss"));
 
             var x = 1;
@@ -284,7 +312,12 @@ namespace ServicesCekTradefeed
                     connection.Close();
                 }
                 dr_approveAll.uspTradeFeedExceptionApproveAll(2, businessDate, "A", "oke", "Robot KBI");
-                bot.SendTextMessageAsync(chat_id, "Business Date : " + businessDate.ToShortDateString() + "\n\nSettlement Price " + dt_validasi[0].count_sp + " Record\nTradefeed Exceptions " + dt_validasi[0].count_ex + " Record\n\nSuccessfully run the auto approve command\nSuccess execute [uspMigrateSettlementPriceRedo]\n\nTime Stamp :" + DateTime.Now.ToString("hh:mm:ss"), ParseMode.Markdown);
+                var dataSP = "-";
+                if (dataSPurgent.Count != 0)
+                {
+                    dataSP = String.Join("\n", dataSPurgent);
+                }
+                bot.SendTextMessageAsync(chat_id, "Business Date : " + businessDate.ToShortDateString() + "\n\nSettlement Price " + dt_validasi[0].count_sp + " Record\nTradefeed Exceptions " + dt_validasi[0].count_ex + " Record\nSettlement Price Urgent "+count_sp_urgent+"\nData SP Urgent : \n"+dataSP+"\nSuccessfully run the auto approve command\nSuccess execute [uspMigrateSettlementPriceRedo]\n\nTime Stamp :" + DateTime.Now.ToString("hh:mm:ss"), ParseMode.Markdown);
 
             }
             catch (Exception ex)
