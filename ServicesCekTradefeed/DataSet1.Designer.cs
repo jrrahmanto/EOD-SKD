@@ -25155,18 +25155,20 @@ SELECT SubCategoryCode, SubCategoryID, CategoryID, Description, CreatedBy, Creat
             this._commandCollection = new global::System.Data.SqlClient.SqlCommand[1];
             this._commandCollection[0] = new global::System.Data.SqlClient.SqlCommand();
             this._commandCollection[0].Connection = this.Connection;
-            this._commandCollection[0].CommandText = "SELECT TOP (4) a.CMID, a.BusinessDate, a.PALN, b.Name\r\nFROM     iDfsFasPaln AS a " +
-                "INNER JOIN\r\n                  ClearingMember AS b ON a.CMID = b.CMID\r\nORDER BY a" +
-                ".BusinessDate DESC";
+            this._commandCollection[0].CommandText = "SELECT a.CMID, a.BusinessDate, a.PALN, b.Name\r\nFROM   iDfsFasPaln AS a INNER JOIN" +
+                "\r\n             ClearingMember AS b ON a.CMID = b.CMID\r\nWHERE (a.BusinessDate = @" +
+                "date)";
             this._commandCollection[0].CommandType = global::System.Data.CommandType.Text;
+            this._commandCollection[0].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@date", global::System.Data.SqlDbType.DateTime, 8, global::System.Data.ParameterDirection.Input, 0, 0, "BusinessDate", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
         [global::System.ComponentModel.DataObjectMethodAttribute(global::System.ComponentModel.DataObjectMethodType.Fill, true)]
-        public virtual int Fill(DataSet1.iDfsFasPalnDataTable dataTable) {
+        public virtual int Fill(DataSet1.iDfsFasPalnDataTable dataTable, System.DateTime date) {
             this.Adapter.SelectCommand = this.CommandCollection[0];
+            this.Adapter.SelectCommand.Parameters[0].Value = ((System.DateTime)(date));
             if ((this.ClearBeforeFill == true)) {
                 dataTable.Clear();
             }
@@ -25178,8 +25180,9 @@ SELECT SubCategoryCode, SubCategoryID, CategoryID, Description, CreatedBy, Creat
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
         [global::System.ComponentModel.DataObjectMethodAttribute(global::System.ComponentModel.DataObjectMethodType.Select, true)]
-        public virtual DataSet1.iDfsFasPalnDataTable GetData() {
+        public virtual DataSet1.iDfsFasPalnDataTable GetData(System.DateTime date) {
             this.Adapter.SelectCommand = this.CommandCollection[0];
+            this.Adapter.SelectCommand.Parameters[0].Value = ((System.DateTime)(date));
             DataSet1.iDfsFasPalnDataTable dataTable = new DataSet1.iDfsFasPalnDataTable();
             this.Adapter.Fill(dataTable);
             return dataTable;
@@ -28038,8 +28041,8 @@ SELECT id, CommodityCode FROM ParameterSettlementPriceUrgent WHERE (id = @id)";
             this._commandCollection[0].CommandType = global::System.Data.CommandType.Text;
             this._commandCollection[1] = new global::System.Data.SqlClient.SqlCommand();
             this._commandCollection[1].Connection = this.Connection;
-            this._commandCollection[1].CommandText = "SELECT ParameterSettlementPriceUrgent.*\r\nFROM   ParameterSettlementPriceUrgent\r\nW" +
-                "HERE CommodityCode = @code";
+            this._commandCollection[1].CommandText = "SELECT id, CommodityCode\r\nFROM   ParameterSettlementPriceUrgent\r\nWHERE (Commodity" +
+                "Code = @code)";
             this._commandCollection[1].CommandType = global::System.Data.CommandType.Text;
             this._commandCollection[1].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@code", global::System.Data.SqlDbType.VarChar, 100, global::System.Data.ParameterDirection.Input, 0, 0, "CommodityCode", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
         }

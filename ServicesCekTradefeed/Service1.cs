@@ -32,6 +32,7 @@ using System.Reflection;
 using Telegram.Bot.Types;
 using File = System.IO.File;
 using System.Security.Cryptography;
+using System.Web.Routing;
 
 namespace ServicesCekTradefeed
 {
@@ -110,6 +111,12 @@ namespace ServicesCekTradefeed
                         gettotalpaln(message.Chat.Id, message.Text);
                         monitoringServices("DOP_EODTele", "I", "Service untuk get data total PALN");
                     }
+                    if (message.ReplyToMessage.Text.Contains("rptClearingHouseBalance"))
+                    {
+
+                        rptClearingHouseBalance(message.Chat.Id, message.Text);
+                        monitoringServices("DOP_EODTele", "I", "Service untuk get data total PALN");
+                    }
                 }
                 if (message.Type == MessageType.Text)
                 {
@@ -165,7 +172,7 @@ namespace ServicesCekTradefeed
                     }
                     if (text == "/getdatapaln@Automation_KBI_Bot")
                     {
-                        getdataPaln(message.Chat.Id);
+                        getdataPaln(message.Chat.Id, buseinesdate);
                         monitoringServices("DOP_EODTele", "I", "Service untuk get data PALN");
 
                     }
@@ -173,6 +180,12 @@ namespace ServicesCekTradefeed
                     {
                         rptShortageDailyDKA(message.Chat.Id);
                         monitoringServices("DOP_EODTele", "I", "Service untuk generate report shortage daily");
+
+                    }
+                    if (text == "/rptclearinghousebalance@Automation_KBI_Bot")
+                    {
+                        bot.SendTextMessageAsync(message.Chat.Id, "- rptClearingHouseBalance\nPlease answer business date\n(yyyy-MM-dd)", ParseMode.Markdown);
+                        monitoringServices("DOP_EODTele", "I", "Service untuk generate report clearing house balance");
 
                     }
                     if (text == "/pengecekenreport@Automation_KBI_Bot")
@@ -194,6 +207,12 @@ namespace ServicesCekTradefeed
                     if (text == "/cektotalfeepaln@Automation_KBI_Bot")
                     {
                         bot.SendTextMessageAsync(message.Chat.Id, "*fee paln*\nPlease answer this message\n\n*startdate (yyyy-MM-dd)\n*endDate (yyyy-MM-dd)", ParseMode.Markdown);
+                        monitoringServices("DOP_EODTele", "I", "Service untuk request check total fee PALN");
+                    }
+                    if (text.Contains("tradefeeddemo"))
+                    {
+                        bot.SendTextMessageAsync(message.Chat.Id, "Processing...", ParseMode.Markdown);
+                        tradefeeddemo(message.Chat.Id, buseinesdate);
                         monitoringServices("DOP_EODTele", "I", "Service untuk request check total fee PALN");
                     }
                 }
@@ -245,6 +264,33 @@ namespace ServicesCekTradefeed
                 WriteToFile("prosess fail " + ex.Message + " " + DateTime.Now.ToString());
             }
         }
+
+        private static void tradefeeddemo(long id, DateTime businesdate)
+        {
+            try
+            {
+                var dr_sod = new SKDDEMOTableAdapters.ParameterTableAdapter();
+                var dt_sod = dr_sod.GetDataByCode("BusinessDate");
+                dt_sod[0].DateValue = businesdate;
+                dt_sod[0].LastUpdatedBy = "Robot KBI";
+                dt_sod[0].LastUpdatedDate = DateTime.Now;
+                dr_sod.Update(dt_sod);
+
+                var dr_sod2 = new SKDDEMOTableAdapters.ParameterTableAdapter();
+                var dt_sod2 = dr_sod2.GetDataByCode("LastEOD");
+                dt_sod2[0].DateValue = businesdate.AddDays(-1);
+                dt_sod2[0].LastUpdatedBy = "Robot KBI";
+                dt_sod2[0].LastUpdatedDate = DateTime.Now;
+                dr_sod2.Update(dt_sod2);
+
+                bot.SendTextMessageAsync(id, "..done");
+            }
+            catch (Exception x)
+            {
+                bot.SendTextMessageAsync(id, x.Message);
+            }
+        }
+
         public static void cektradefeed(long chat_id, DateTime businessDate)
         {
             var dr_tr = new DataSet1TableAdapters.DataTable1TableAdapter();
@@ -278,18 +324,21 @@ namespace ServicesCekTradefeed
                         var dt_urgent = dr_SPUrgent.GetDataByUrgent(item.ContractID,businessDate).FirstOrDefault();
                         if (dt_urgent == null)
                         {
-                            count_sp_urgent++;
-                            dataSPurgent.Add(dt_com.CommodityCode);
+                            var dt_commodityurgent = dr_parameterSP.GetDataByCode(dt_com.CommodityCode).FirstOrDefault();
+                            if (dt_commodityurgent != null)
+                            {
+                                count_sp_urgent++;
+                                dataSPurgent.Add(dt_com.CommodityCode);
+                            }
                         }
                     }
                 }
             }
             WriteToFile("Validasi EOD " + DateTime.Now.ToString("hh:mm:ss"));
 
-            var x = 1;
             var dr_trade_exception = new DataSet1TableAdapters.TradefeedExceptionTableAdapter();
             var dr_approveAll = new DataSet1TableAdapters.QueriesTableAdapter();
-            //var dt_trade_excption = dr_trade_exception.GetDataByStatus(DateTime.Now.AddDays(-1));
+
             try
             {
                 string printOutput = "";
@@ -632,8 +681,8 @@ namespace ServicesCekTradefeed
                 IWebElement password = ChromeDriver.FindElement(By.Id("uiAuthLogin_Password"));
                 IWebElement submit_login = ChromeDriver.FindElement(By.Id("uiAuthLogin_LoginImageButton"));
 
-                username.SendKeys("Hasto");
-                password.SendKeys("Jakarta2019");
+                username.SendKeys("jujukr");
+                password.SendKeys("Indonesia@2022()");
                 submit_login.Click();
                 WriteToFile("Sukses connect");
                 ChromeDriver.Navigate().GoToUrl("http://10.10.10.79/ClearingAndSettlement/PublishReport2.aspx");
@@ -669,12 +718,10 @@ namespace ServicesCekTradefeed
                 Thread.Sleep(720000);
                 if (loading.Displayed)
                 {
-                    bot.SendTextMessageAsync(chat_id, "Masih proses, sabar ya.. : " + DateTime.Now.ToString("hh:mm:ss"), ParseMode.Markdown);
                     Thread.Sleep(60000);
                 }
                 if (loading.Displayed)
                 {
-                    bot.SendTextMessageAsync(chat_id, "Masih proses, sabar ya.. : " + DateTime.Now.ToString("hh:mm:ss"), ParseMode.Markdown);
                     Thread.Sleep(60000);
                 }
                 if (loading.Displayed)
@@ -733,8 +780,8 @@ namespace ServicesCekTradefeed
                 IWebElement password = ChromeDriver.FindElement(By.Id("uiAuthLogin_Password"));
                 IWebElement submit_login = ChromeDriver.FindElement(By.Id("uiAuthLogin_LoginImageButton"));
 
-                username.SendKeys("Hasto");
-                password.SendKeys("Jakarta2019");
+                username.SendKeys("jujukr");
+                password.SendKeys("Indonesia@2022()");
                 submit_login.Click();
                 WriteToFile("Login sukses");
                 ChromeDriver.Navigate().GoToUrl("http://10.10.10.79/ClearingAndSettlement/PublishReport2.aspx");
@@ -848,8 +895,8 @@ namespace ServicesCekTradefeed
                 IWebElement password = ChromeDriver.FindElement(By.Id("uiAuthLogin_Password"));
                 IWebElement submit_login = ChromeDriver.FindElement(By.Id("uiAuthLogin_LoginImageButton"));
 
-                username.SendKeys("Hasto");
-                password.SendKeys("Jakarta2019");
+                username.SendKeys("jujukr");
+                password.SendKeys("Indonesia@2022()");
                 submit_login.Click();
                 WriteToFile("Sukses Login 6281310215750 - 1548729946@g.us");
 
@@ -1104,12 +1151,12 @@ namespace ServicesCekTradefeed
                 }
             }
         }
-        public static void getdataPaln(long chat_id)
+        public static void getdataPaln(long chat_id, DateTime businessdate)
         {
             try
             {
                 var dr = new DataSet1TableAdapters.iDfsFasPalnTableAdapter();
-                var dt = dr.GetData();
+                var dt = dr.GetData(businessdate);
                 List<string> data = new List<string>();
                 if (dt.Count != 0)
                 {
@@ -1142,6 +1189,21 @@ namespace ServicesCekTradefeed
                 bot.SendTextMessageAsync(chat_id, "Generate failed " + x.Message + " " + DateTime.Now.ToString("HH:mm:ss"), ParseMode.Markdown);
             }
         }
+        public static async void rptClearingHouseBalance(long chat_id, string businesdate)
+        {
+            try
+            {
+                bot.SendTextMessageAsync(chat_id, "Generate start " + DateTime.Now.ToString("HH:mm:ss"), ParseMode.Markdown);
+
+                string path = getReportSSRSPDF("RptClearingHouseBalance", "&businessDate=" + businesdate);
+                sendFileTelegram("-1001671146559", path);
+
+            }
+            catch (Exception x)
+            {
+                bot.SendTextMessageAsync(chat_id, "Generate failed " + x.Message + " " + DateTime.Now.ToString("HH:mm:ss"), ParseMode.Markdown);
+            }
+        }
         public static void insertIrca(long chat_id, string path)
         {
             try
@@ -1149,6 +1211,7 @@ namespace ServicesCekTradefeed
                 bot.SendTextMessageAsync(chat_id, "Process insert IRCA start " + DateTime.Now.ToString("HH:mm:ss"), ParseMode.Markdown);
                 List<irca_parameter> data_excel = new List<irca_parameter>();
                 string con = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=" + path + ";Extended Properties='Excel 8.0;HDR=Yes;';";
+                WriteToFile("IRCA START");
                 using (OleDbConnection connection = new OleDbConnection(con))
                 {
                     connection.Open();
@@ -1167,6 +1230,7 @@ namespace ServicesCekTradefeed
                         }
                     }
                 }
+                WriteToFile("IRCA STEP 1");
                 var ta = new DataSet1TableAdapters.irca_parameterTableAdapter();
                 var dt = ta.GetData();
                 foreach (var old in data_excel)
@@ -1192,6 +1256,7 @@ namespace ServicesCekTradefeed
                         }
                     }
                 }
+                WriteToFile("IRCA STEP 2");
                 var ta_irp = new DataSet1TableAdapters.irca_productTableAdapter();
                 var tac = new DataSet1TableAdapters.CommodityTableAdapter();
                 var tar = new DataSet1TableAdapters.IRCATableAdapter();
@@ -1237,6 +1302,7 @@ namespace ServicesCekTradefeed
                         }
                     }
                 }
+                WriteToFile("IRCA STEP 3");
                 StringBuilder sb = new StringBuilder();
 
                 sb.AppendLine("product;date;irca");
@@ -1246,7 +1312,7 @@ namespace ServicesCekTradefeed
                     string line = lvpn.product + ";" + lvpn.date + ";" + lvpn.irca;
                     sb.AppendLine(line);
                 }
-
+                WriteToFile("IRCA STEP 4");
                 string pathCsv = AppDomain.CurrentDomain.BaseDirectory + "\\irca.csv";
                 System.IO.File.WriteAllText(pathCsv, sb.ToString());
                 sendFileTelegram(chat_id.ToString(), pathCsv);
@@ -1702,6 +1768,40 @@ namespace ServicesCekTradefeed
                 throw;
             }
         }
+        public static string getReportSSRSPDF(string filename, string parameter)
+        {
+            try
+            {
+                string ori_url = System.Configuration.ConfigurationManager.ConnectionStrings["reportserver"].ConnectionString;
+                string url = ori_url + "?/SKDReport/" + filename + "&rs:Command=Render&rs:Format=PDF" + parameter;
+
+                System.Net.HttpWebRequest Req = (System.Net.HttpWebRequest)System.Net.WebRequest.Create(url);
+                Req.Credentials = new NetworkCredential("administrator", "Indonesia@2022");
+                Req.Method = "GET";
+                Req.Timeout = 1200000;
+                string path = AppDomain.CurrentDomain.BaseDirectory + "\\" + filename + ".pdf";
+
+                System.Net.WebResponse objResponse = Req.GetResponse();
+                System.IO.FileStream fs = new System.IO.FileStream(path, System.IO.FileMode.Create);
+                System.IO.Stream stream = objResponse.GetResponseStream();
+
+                byte[] buf = new byte[1024];
+                int len = stream.Read(buf, 0, 1024);
+                while (len > 0)
+                {
+                    fs.Write(buf, 0, len);
+                    len = stream.Read(buf, 0, 1024);
+                }
+                stream.Close();
+                fs.Close();
+                return path;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
         public class irca_parameter
         {
             public string pair { get; set; }

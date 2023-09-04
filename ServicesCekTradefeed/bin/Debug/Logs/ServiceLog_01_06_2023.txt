@@ -1,0 +1,50 @@
+Service is started at 01/06/2023 15:05:22
+Start listening!!
+Document
+dokumen masuk kesini
+D:\Source Code\Micoservices Code\service_pbk\ServiceEOD\ServicesCekTradefeed\bin\Debug\Beda Bunga CURR Juni 2023.xlsx
+IRCA START
+Document
+dokumen masuk kesini
+D:\Source Code\Micoservices Code\service_pbk\ServiceEOD\ServicesCekTradefeed\bin\Debug\Beda Bunga CURR Juni 2023.xlsx
+IRCA START
+Service is started at 01/06/2023 15:08:40
+Service is started at 01/06/2023 15:08:41
+Start listening!!
+Document
+dokumen masuk kesini
+D:\Source Code\Micoservices Code\service_pbk\ServiceEOD\ServicesCekTradefeed\bin\Debug\Beda Bunga CURR Juni 2023.xlsx
+IRCA START
+Service is started at 01/06/2023 15:09:50
+Service is started at 01/06/2023 15:09:51
+Start listening!!
+Document
+dokumen masuk kesini
+D:\Source Code\Micoservices Code\service_pbk\ServiceEOD\ServicesCekTradefeed\bin\Debug\Beda Bunga CURR Juni 2023.xlsx
+IRCA START
+Service is started at 01/06/2023 15:10:31
+Service is started at 01/06/2023 15:11:19
+Start listening!!
+Document
+dokumen masuk kesini
+D:\Source Code\Micoservices Code\service_pbk\ServiceEOD\ServicesCekTradefeed\bin\Debug\Beda Bunga CURR Juni 2023.xlsx
+IRCA START
+Service is started at 01/06/2023 15:12:13
+Service is started at 01/06/2023 15:12:26
+Start listening!!
+Document
+dokumen masuk kesini
+D:\Source Code\Micoservices Code\service_pbk\ServiceEOD\ServicesCekTradefeed\bin\Debug\Beda Bunga CURR Juni 2023.xlsx
+IRCA START
+Service is started at 01/06/2023 15:12:43
+Service is started at 01/06/2023 15:15:34
+Start listening!!
+Document
+dokumen masuk kesini
+D:\Source Code\Micoservices Code\service_pbk\ServiceEOD\ServicesCekTradefeed\bin\Debug\Beda Bunga CURR Juni 2023.xlsx
+IRCA START
+IRCA STEP 1
+IRCA STEP 2
+IRCA STEP 3
+IRCA STEP 4
+Service is started at 01/06/2023 15:17:32
